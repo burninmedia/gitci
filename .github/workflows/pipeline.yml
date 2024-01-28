@@ -1,0 +1,64 @@
+name: Immutable CI/CD Pipeline
+
+on:
+  push:
+  pull_request:
+jobs:
+  pre-build:
+    runs-on: ubuntu-latest
+    container: 
+      image: burninmedia/build-image:Major.Minor.*
+    steps:
+      - uses: actions/checkout@v2
+      - name: Pre-Build Actions
+        run: echo "Running pre-build steps"
+
+  build:
+    needs: pre-build
+    runs-on: ubuntu-latest
+    container: 
+      image: burninmedia/build-image:Major.Minor.*
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build Actions
+        run: echo "Running build steps"
+
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    container: 
+      image: burninmedia/build-image:Major.Minor.*
+    steps:
+      - uses: actions/checkout@v2
+      - name: Test Actions
+        run: echo "Running tests"
+
+  security-vulnerability:
+    needs: test
+    runs-on: ubuntu-latest
+    container: 
+      image: burninmedia/build-image:Major.Minor.*
+    steps:
+      - uses: actions/checkout@v2
+      - name: Linting
+        run: echo "Running linting checks"
+      - name: Security and Vulnerability Scanning
+        run: echo "Running security and vulnerability checks"
+
+  gitops-deploy:
+    needs: security-vulnerability
+    runs-on: ubuntu-latest
+    container: 
+      image: burninmedia/build-image:Major.Minor.*
+    steps:
+      - uses: actions/checkout@v2
+      - name: GitOps Deployment
+        run: echo "Running GitOps deployment steps"
+
+  release:
+    needs: gitops-deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Release Actions
+        run: echo "Running release steps"
